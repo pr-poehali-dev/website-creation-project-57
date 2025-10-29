@@ -130,7 +130,7 @@ const Index = () => {
                 <CardFooter className="p-6 pt-0">
                   <Button 
                     className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-                    onClick={() => window.open(`https://t.me/your_telegram_username?text=Хочу купить: ${product.name} (${product.price} ₽)`, '_blank')}
+                    onClick={() => window.open(`https://t.me/CeTzyyy?text=Хочу купить: ${product.name} (${product.price} ₽)`, '_blank')}
                   >
                     Перейти к покупке
                   </Button>
