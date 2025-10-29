@@ -41,9 +41,17 @@ const Index = () => {
             <a href="#catalog" className="text-foreground/80 hover:text-foreground transition-colors">Каталог</a>
             <a href="#reviews" className="text-foreground/80 hover:text-foreground transition-colors">Отзывы</a>
           </nav>
-          <Button variant="outline" size="icon">
-            <Icon name="ShoppingCart" size={20} />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link to="/login">
+              <Button variant="outline">
+                <Icon name="User" size={18} className="mr-2" />
+                Вход
+              </Button>
+            </Link>
+            <Button variant="outline" size="icon">
+              <Icon name="ShoppingCart" size={20} />
+            </Button>
+          </div>
         </div>
       </header>
 
