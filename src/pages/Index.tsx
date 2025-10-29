@@ -91,7 +91,7 @@ const Index = () => {
             <Tabs value={category} onValueChange={setCategory}>
               <TabsList className="bg-card">
                 <TabsTrigger value="all">Всё</TabsTrigger>
-                <TabsTrigger value="electronics">Электроника</TabsTrigger>
+                <TabsTrigger value="electronics">Brainrot</TabsTrigger>
                 <TabsTrigger value="clothing">Одежда</TabsTrigger>
                 <TabsTrigger value="shoes">Обувь</TabsTrigger>
                 <TabsTrigger value="accessories">Аксессуары</TabsTrigger>
@@ -118,7 +118,7 @@ const Index = () => {
                     </div>
                   </div>
                   <Badge variant="secondary" className="mb-3">
-                    {product.category === 'electronics' && 'Электроника'}
+                    {product.category === 'electronics' && 'Brainrot'}
                     {product.category === 'clothing' && 'Одежда'}
                     {product.category === 'shoes' && 'Обувь'}
                     {product.category === 'accessories' && 'Аксессуары'}
