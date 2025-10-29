@@ -6,16 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const products = [
-  { id: 1, name: 'Беспроводные наушники', price: 4990, category: 'electronics', image: '🎧', rating: 4.8 },
-  { id: 2, name: 'Смарт-часы', price: 8990, category: 'electronics', image: '⌚', rating: 4.6 },
-  { id: 3, name: 'Рюкзак городской', price: 2990, category: 'accessories', image: '🎒', rating: 4.9 },
-  { id: 4, name: 'Кроссовки беговые', price: 6990, category: 'shoes', image: '👟', rating: 4.7 },
-  { id: 5, name: 'Толстовка унисекс', price: 3490, category: 'clothing', image: '👕', rating: 4.5 },
-  { id: 6, name: 'Термокружка', price: 1290, category: 'accessories', image: '☕', rating: 4.8 },
-  { id: 7, name: 'Bluetooth колонка', price: 3990, category: 'electronics', image: '🔊', rating: 4.6 },
-  { id: 8, name: 'Солнцезащитные очки', price: 2490, category: 'accessories', image: '🕶️', rating: 4.4 },
-];
+const products = [];
 
 const reviews = [
   { id: 1, name: 'Анна К.', text: 'Отличный магазин! Быстрая доставка и качественные товары', rating: 5 },
