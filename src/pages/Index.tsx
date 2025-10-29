@@ -59,8 +59,9 @@ const Index = () => {
               У нас все честно и надежно!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="outline" className="border-2">
-                Правила
+              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white relative overflow-hidden group">
+                <span className="relative z-10">Правила</span>
+                <span className="absolute inset-0 bg-green-400 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></span>
               </Button>
               <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
                 Смотреть товары
