@@ -39,7 +39,6 @@ const Index = () => {
           <nav className="hidden md:flex gap-8">
             <a href="#catalog" className="text-foreground/80 hover:text-foreground transition-colors">Каталог</a>
             <a href="#reviews" className="text-foreground/80 hover:text-foreground transition-colors">Отзывы</a>
-            <a href="#contacts" className="text-foreground/80 hover:text-foreground transition-colors">Контакты</a>
           </nav>
           <Button variant="outline" size="icon">
             <Icon name="ShoppingCart" size={20} />
@@ -161,39 +160,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section id="contacts" className="py-16">
-        <div className="container mx-auto px-4 max-w-md">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">Свяжись с нами</h2>
-          <Card className="border-border/50">
-            <CardContent className="p-6 space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Имя</label>
-                <Input placeholder="Твоё имя" />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Email</label>
-                <Input type="email" placeholder="email@example.com" />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Сообщение</label>
-                <Input placeholder="Чем можем помочь?" />
-              </div>
-              <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-                Отправить
-              </Button>
-            </CardContent>
-          </Card>
-          
-          <div className="mt-8 flex justify-center gap-4">
-            <Button variant="outline" size="icon">
-              <Icon name="Send" size={20} />
-            </Button>
-            <Button variant="outline" size="icon">
-              <Icon name="Mail" size={20} />
-            </Button>
-          </div>
-        </div>
-      </section>
+
 
       <footer className="border-t border-border py-8 mt-16">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
