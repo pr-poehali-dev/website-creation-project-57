@@ -3,16 +3,44 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Login() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    const user = users.find(
+      (u: any) => u.email === formData.email && u.password === formData.password
+    );
+
+    if (user) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      toast({
+        title: 'Добро пожаловать!',
+        description: `Рады видеть вас, ${user.name}!`
+      });
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+    } else {
+      toast({
+        title: 'Ошибка',
+        description: 'Неверный email или пароль',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

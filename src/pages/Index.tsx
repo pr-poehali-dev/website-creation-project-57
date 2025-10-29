@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -23,6 +23,19 @@ const reviews = [];
 const Index = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem('currentUser');
+    if (user) {
+      setCurrentUser(JSON.parse(user));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    setCurrentUser(null);
+  };
 
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
@@ -42,12 +55,24 @@ const Index = () => {
             <a href="#reviews" className="text-foreground/80 hover:text-foreground transition-colors">Отзывы</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Link to="/login">
-              <Button variant="outline">
-                <Icon name="User" size={18} className="mr-2" />
-                Вход
-              </Button>
-            </Link>
+            {currentUser ? (
+              <>
+                <span className="text-sm text-muted-foreground hidden md:inline">
+                  {currentUser.name}
+                </span>
+                <Button variant="outline" onClick={handleLogout}>
+                  <Icon name="LogOut" size={18} className="mr-2" />
+                  Выход
+                </Button>
+              </>
+            ) : (
+              <Link to="/login">
+                <Button variant="outline">
+                  <Icon name="User" size={18} className="mr-2" />
+                  Вход
+                </Button>
+              </Link>
+            )}
             <Button variant="outline" size="icon">
               <Icon name="ShoppingCart" size={20} />
             </Button>

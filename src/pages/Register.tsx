@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -15,9 +16,59 @@ export default function Register() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пароли не совпадают',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пароль должен содержать минимум 6 символов',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    const existingUser = users.find((u: any) => u.email === formData.email);
+    if (existingUser) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пользователь с таким email уже существует',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const newUser = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password
+    };
+
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+
+    toast({
+      title: 'Успешно!',
+      description: 'Регистрация прошла успешно. Теперь вы можете войти.'
+    });
+
+    setTimeout(() => {
+      navigate('/login');
+    }, 1500);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
