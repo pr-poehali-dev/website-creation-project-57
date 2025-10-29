@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const products = [
   { 
@@ -24,6 +24,7 @@ const Index = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const user = localStorage.getItem('currentUser');
@@ -35,6 +36,14 @@ const Index = () => {
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     setCurrentUser(null);
+  };
+
+  const handlePurchase = (product: any) => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+    window.open(`https://t.me/CeTzyyy?text=Хочу купить: ${product.name} (${product.price} ₽)`, '_blank');
   };
 
   const filteredProducts = products.filter(p => {
@@ -165,7 +174,7 @@ const Index = () => {
                 <CardFooter className="p-6 pt-0">
                   <Button 
                     className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-                    onClick={() => window.open(`https://t.me/CeTzyyy?text=Хочу купить: ${product.name} (${product.price} ₽)`, '_blank')}
+                    onClick={() => handlePurchase(product)}
                   >
                     Перейти к покупке
                   </Button>
