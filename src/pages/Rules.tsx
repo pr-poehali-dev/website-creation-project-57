@@ -13,7 +13,7 @@ export default function Rules() {
                 <Icon name="Sparkles" size={24} className="text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                URBAN
+                MNS.shop
               </span>
             </Link>
             <Link to="/">
