@@ -58,10 +58,15 @@ const Index = () => {
             <p className="text-xl text-muted-foreground mb-8">
               У нас все честно и надежно!
             </p>
-            <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
-              Смотреть товары
-              <Icon name="ArrowRight" size={20} className="ml-2" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="outline" className="border-2">
+                Правила
+              </Button>
+              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
+                Смотреть товары
+                <Icon name="ArrowRight" size={20} className="ml-2" />
+              </Button>
+            </div>
           </div>
         </div>
       </section>
