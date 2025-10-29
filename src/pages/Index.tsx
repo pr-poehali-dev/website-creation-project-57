@@ -103,8 +103,12 @@ const Index = () => {
             {filteredProducts.map((product, index) => (
               <Card key={product.id} className="group hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 animate-scale-in border-border/50" style={{ animationDelay: `${index * 50}ms` }}>
                 <CardContent className="p-6">
-                  <div className="text-6xl mb-4 text-center group-hover:scale-110 transition-transform duration-300">
-                    {product.image}
+                  <div className="mb-4 text-center overflow-hidden rounded-lg">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
                   </div>
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold text-lg">{product.name}</h3>
