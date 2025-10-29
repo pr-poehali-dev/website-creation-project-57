@@ -66,10 +66,12 @@ const Index = () => {
                   <span className="absolute inset-0 bg-green-400 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></span>
                 </Button>
               </Link>
-              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
-                Смотреть товары
-                <Icon name="ArrowRight" size={20} className="ml-2" />
-              </Button>
+              <a href="#catalog">
+                <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
+                  Смотреть товары
+                  <Icon name="ArrowRight" size={20} className="ml-2" />
+                </Button>
+              </a>
             </div>
           </div>
         </div>
