@@ -92,9 +92,6 @@ const Index = () => {
               <TabsList className="bg-card">
                 <TabsTrigger value="all">Всё</TabsTrigger>
                 <TabsTrigger value="electronics">Brainrot</TabsTrigger>
-                <TabsTrigger value="clothing">Одежда</TabsTrigger>
-                <TabsTrigger value="shoes">Обувь</TabsTrigger>
-                <TabsTrigger value="accessories">Аксессуары</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
