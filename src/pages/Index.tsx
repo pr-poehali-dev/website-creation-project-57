@@ -6,7 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const products = [];
+const products = [
+  { 
+    id: 1, 
+    name: 'Los Mobilis Yin Yang', 
+    price: 165, 
+    category: 'electronics', 
+    image: 'https://cdn.poehali.dev/files/20b3b8e7-ba98-4bdc-bf25-59937138561f.jpg', 
+    rating: 4.9 
+  },
+];
 
 const reviews = [
   { id: 1, name: 'Анна К.', text: 'Отличный магазин! Быстрая доставка и качественные товары', rating: 5 },
