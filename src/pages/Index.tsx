@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 const products = [
   { 
     id: 1, 
-    name: 'Los Mobilis Yin Yang', 
+    name: 'Los Mobilis Yin Yang 165 M/S', 
     price: 400, 
     category: 'electronics', 
     image: 'https://cdn.poehali.dev/files/20b3b8e7-ba98-4bdc-bf25-59937138561f.jpg', 
