@@ -55,48 +55,6 @@ export default function Rules() {
 
           <section className="bg-card border border-border rounded-2xl p-6">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <Icon name="Package" size={28} className="text-primary" />
-              Доставка и возврат
-            </h2>
-            <ul className="space-y-3 text-muted-foreground">
-              <li className="flex gap-2">
-                <Icon name="Check" size={20} className="text-primary flex-shrink-0 mt-0.5" />
-                <span>Доставка по всей России от 1 до 7 дней</span>
-              </li>
-              <li className="flex gap-2">
-                <Icon name="Check" size={20} className="text-primary flex-shrink-0 mt-0.5" />
-                <span>Бесплатный возврат в течение 14 дней</span>
-              </li>
-              <li className="flex gap-2">
-                <Icon name="Check" size={20} className="text-primary flex-shrink-0 mt-0.5" />
-                <span>Проверка товара при получении</span>
-              </li>
-            </ul>
-          </section>
-
-          <section className="bg-card border border-border rounded-2xl p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <Icon name="CreditCard" size={28} className="text-secondary" />
-              Оплата
-            </h2>
-            <ul className="space-y-3 text-muted-foreground">
-              <li className="flex gap-2">
-                <Icon name="Check" size={20} className="text-secondary flex-shrink-0 mt-0.5" />
-                <span>Безопасная оплата онлайн картой</span>
-              </li>
-              <li className="flex gap-2">
-                <Icon name="Check" size={20} className="text-secondary flex-shrink-0 mt-0.5" />
-                <span>Оплата при получении (наложенный платёж)</span>
-              </li>
-              <li className="flex gap-2">
-                <Icon name="Check" size={20} className="text-secondary flex-shrink-0 mt-0.5" />
-                <span>Рассрочка от банков-партнёров</span>
-              </li>
-            </ul>
-          </section>
-
-          <section className="bg-card border border-border rounded-2xl p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
               <Icon name="Users" size={28} className="text-accent" />
               Поддержка клиентов
             </h2>
