@@ -10,7 +10,7 @@ const products = [
   { 
     id: 1, 
     name: 'Los Mobilis Yin Yang', 
-    price: 165, 
+    price: 400, 
     category: 'electronics', 
     image: 'https://cdn.poehali.dev/files/20b3b8e7-ba98-4bdc-bf25-59937138561f.jpg', 
     rating: 4.9 
