@@ -186,9 +186,6 @@ const Index = () => {
           
           <div className="mt-8 flex justify-center gap-4">
             <Button variant="outline" size="icon">
-              <Icon name="Instagram" size={20} />
-            </Button>
-            <Button variant="outline" size="icon">
               <Icon name="Send" size={20} />
             </Button>
             <Button variant="outline" size="icon">
