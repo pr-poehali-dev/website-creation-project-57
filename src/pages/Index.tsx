@@ -52,7 +52,7 @@ const Index = () => {
           <div className="max-w-3xl mx-auto text-center animate-fade-in">
             <h2 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Быстро, надёжно и без обмана
+                Быстро, надёжно без обмана
               </span>
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
