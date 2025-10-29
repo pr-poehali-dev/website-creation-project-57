@@ -56,7 +56,7 @@ const Index = () => {
               </span>
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Топовые товары для молодых и активных. Находи своё — быстро и стильно
+              У нас все честно и надежно!
             </p>
             <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
               Смотреть товары
