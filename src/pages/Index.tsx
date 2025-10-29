@@ -29,7 +29,7 @@ const Index = () => {
       <header className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            SHOPWAVE
+            MNS.shop
           </h1>
           <nav className="hidden md:flex gap-8">
             <a href="#catalog" className="text-foreground/80 hover:text-foreground transition-colors">Каталог</a>
@@ -191,7 +191,7 @@ const Index = () => {
 
       <footer className="border-t border-border py-8 mt-16">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>© 2025 SHOPWAVE. Все права защищены</p>
+          <p>© 2025 MNS.shop. Все права защищены</p>
         </div>
       </footer>
     </div>
