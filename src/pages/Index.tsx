@@ -17,11 +17,7 @@ const products = [
   },
 ];
 
-const reviews = [
-  { id: 1, name: 'Анна К.', text: 'Отличный магазин! Быстрая доставка и качественные товары', rating: 5 },
-  { id: 2, name: 'Дмитрий М.', text: 'Заказывал наушники — звук супер, цена огонь!', rating: 5 },
-  { id: 3, name: 'Елена С.', text: 'Очень довольна покупкой, всё пришло вовремя', rating: 4 },
-];
+const reviews = [];
 
 const Index = () => {
   const [search, setSearch] = useState('');
