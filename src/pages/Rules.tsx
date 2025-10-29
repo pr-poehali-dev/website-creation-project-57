@@ -48,7 +48,7 @@ export default function Rules() {
               </li>
               <li className="flex gap-2">
                 <Icon name="Check" size={20} className="text-green-500 flex-shrink-0 mt-0.5" />
-                <span>Мы несём полную ответственность за качество товаров</span>
+                <span>Мы ответственны за то, чтобы вы получили то, что и должны были</span>
               </li>
             </ul>
           </section>
