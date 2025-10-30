@@ -82,19 +82,17 @@ const Index = () => {
           <div className="flex items-center gap-2">
             {currentUser ? (
               <>
-                <span className="text-sm text-muted-foreground hidden md:inline">
-                  {currentUser.name}
-                </span>
                 <Link to="/add-product">
-                  <Button variant="outline">
+                  <Button variant="outline" className="hidden md:flex">
                     <Icon name="Plus" size={18} className="mr-2" />
                     Добавить товар
                   </Button>
                 </Link>
-                <Button variant="outline" onClick={handleLogout}>
-                  <Icon name="LogOut" size={18} className="mr-2" />
-                  Выход
-                </Button>
+                <Link to="/profile">
+                  <Button variant="outline" size="icon">
+                    <Icon name="User" size={20} />
+                  </Button>
+                </Link>
               </>
             ) : (
               <Link to="/login">
