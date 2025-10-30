@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
@@ -12,6 +14,9 @@ const Profile = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState('');
+  const [editedEmail, setEditedEmail] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -21,8 +26,11 @@ const Profile = () => {
       navigate('/login');
       return;
     }
-    setCurrentUser(JSON.parse(user));
-    fetchUserProducts(JSON.parse(user).email);
+    const userData = JSON.parse(user);
+    setCurrentUser(userData);
+    setEditedName(userData.name);
+    setEditedEmail(userData.email);
+    fetchUserProducts(userData.email);
   }, [navigate]);
 
   const fetchUserProducts = async (email: string) => {
@@ -74,6 +82,32 @@ const Profile = () => {
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     navigate('/');
+  };
+
+  const handleSaveProfile = () => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex((u: any) => u.email === currentUser.email);
+    
+    if (userIndex !== -1) {
+      users[userIndex] = { ...users[userIndex], name: editedName, email: editedEmail };
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      const updatedUser = { ...currentUser, name: editedName, email: editedEmail };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+      
+      toast({
+        title: 'Успешно!',
+        description: 'Профиль обновлен'
+      });
+      setIsEditing(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditedName(currentUser.name);
+    setEditedEmail(currentUser.email);
+    setIsEditing(false);
   };
 
   if (!currentUser) {
@@ -207,24 +241,70 @@ const Profile = () => {
             <TabsContent value="settings">
               <Card>
                 <CardHeader>
-                  <CardTitle>Информация об аккаунте</CardTitle>
-                  <CardDescription>Ваши личные данные</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Информация об аккаунте</CardTitle>
+                      <CardDescription>Ваши личные данные</CardDescription>
+                    </div>
+                    {!isEditing && (
+                      <Button variant="outline" onClick={() => setIsEditing(true)}>
+                        <Icon name="Edit" size={18} className="mr-2" />
+                        Редактировать
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Имя</p>
-                    <p className="text-lg">{currentUser.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Email</p>
-                    <p className="text-lg">{currentUser.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Дата регистрации</p>
-                    <p className="text-lg">
-                      {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('ru-RU') : 'Не указана'}
-                    </p>
-                  </div>
+                  {isEditing ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Имя</Label>
+                        <Input 
+                          id="name"
+                          value={editedName}
+                          onChange={(e) => setEditedName(e.target.value)}
+                          placeholder="Введите ваше имя"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input 
+                          id="email"
+                          type="email"
+                          value={editedEmail}
+                          onChange={(e) => setEditedEmail(e.target.value)}
+                          placeholder="Введите ваш email"
+                        />
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <Button onClick={handleSaveProfile} className="flex-1">
+                          <Icon name="Check" size={18} className="mr-2" />
+                          Сохранить
+                        </Button>
+                        <Button onClick={handleCancelEdit} variant="outline" className="flex-1">
+                          <Icon name="X" size={18} className="mr-2" />
+                          Отмена
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Имя</p>
+                        <p className="text-lg">{currentUser.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Email</p>
+                        <p className="text-lg">{currentUser.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Дата регистрации</p>
+                        <p className="text-lg">
+                          {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('ru-RU') : 'Не указана'}
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
