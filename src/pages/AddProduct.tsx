@@ -62,7 +62,7 @@ const AddProduct = () => {
       if (response.ok) {
         toast({
           title: 'Успешно!',
-          description: 'Ваш товар добавлен в каталог'
+          description: 'Ваш Brainrot добавлен в каталог'
         });
         navigate('/');
       } else {
@@ -71,7 +71,7 @@ const AddProduct = () => {
     } catch (error) {
       toast({
         title: 'Ошибка',
-        description: 'Не удалось добавить товар',
+        description: 'Не удалось добавить Brainrot',
         variant: 'destructive'
       });
     } finally {
@@ -98,16 +98,16 @@ const AddProduct = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Добавить товар
+              Добавить Brainrot
             </CardTitle>
             <CardDescription>
-              Заполните информацию о вашем товаре
+              Заполните информацию о вашем Brainrot
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Название товара *</Label>
+                <Label htmlFor="name">Название Brainrot *</Label>
                 <Input
                   id="name"
                   placeholder="Например: iPhone 15 Pro"
@@ -168,7 +168,7 @@ const AddProduct = () => {
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
                 disabled={loading}
               >
-                {loading ? 'Добавление...' : 'Добавить товар'}
+                {loading ? 'Добавление...' : 'Добавить Brainrot'}
               </Button>
             </form>
           </CardContent>
