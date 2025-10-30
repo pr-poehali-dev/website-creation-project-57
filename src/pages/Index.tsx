@@ -24,6 +24,7 @@ const Index = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [userProducts, setUserProducts] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,7 +32,20 @@ const Index = () => {
     if (user) {
       setCurrentUser(JSON.parse(user));
     }
+    fetchProducts();
   }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841');
+      if (response.ok) {
+        const data = await response.json();
+        setUserProducts(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
@@ -46,7 +60,9 @@ const Index = () => {
     window.open(`https://t.me/CeTzyyy?text=Хочу купить: ${product.name} (${product.price} ₽)`, '_blank');
   };
 
-  const filteredProducts = products.filter(p => {
+  const allProducts = [...products, ...userProducts];
+
+  const filteredProducts = allProducts.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = category === 'all' || p.category === category;
     return matchesSearch && matchesCategory;
@@ -69,6 +85,12 @@ const Index = () => {
                 <span className="text-sm text-muted-foreground hidden md:inline">
                   {currentUser.name}
                 </span>
+                <Link to="/add-product">
+                  <Button variant="outline">
+                    <Icon name="Plus" size={18} className="mr-2" />
+                    Добавить товар
+                  </Button>
+                </Link>
                 <Button variant="outline" onClick={handleLogout}>
                   <Icon name="LogOut" size={18} className="mr-2" />
                   Выход

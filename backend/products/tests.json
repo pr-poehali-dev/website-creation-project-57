@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Get all products",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": [],
+      "bodyMatcher": "type"
+    },
+    {
+      "name": "Create new product",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Test Product",
+        "price": 1000,
+        "category": "electronics",
+        "image": "https://example.com/image.jpg",
+        "seller_email": "test@example.com",
+        "seller_name": "Test Seller"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": "number",
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
