@@ -156,7 +156,7 @@ const Profile = () => {
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="products">
                 <Icon name="Package" size={18} className="mr-2" />
-                Мои товары
+                Мои Brainrot
               </TabsTrigger>
               <TabsTrigger value="settings">
                 <Icon name="Settings" size={18} className="mr-2" />
@@ -166,11 +166,11 @@ const Profile = () => {
 
             <TabsContent value="products" className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Мои товары ({userProducts.length})</h2>
+                <h2 className="text-2xl font-bold">Мои Brainrot ({userProducts.length})</h2>
                 <Link to="/add-product">
                   <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
                     <Icon name="Plus" size={18} className="mr-2" />
-                    Добавить товар
+                    Добавить Brainrot
                   </Button>
                 </Link>
               </div>
@@ -183,8 +183,8 @@ const Profile = () => {
                 <Card>
                   <CardContent className="py-12 text-center">
                     <Icon name="Package" size={48} className="mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">У вас пока нет товаров</h3>
-                    <p className="text-muted-foreground mb-4">Добавьте свой первый товар на продажу</p>
+                    <h3 className="text-lg font-semibold mb-2">У вас пока нет Brainrot</h3>
+                    <p className="text-muted-foreground mb-4">Добавьте свой первый Brainrot на продажу</p>
                     <Link to="/add-product">
                       <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
                         <Icon name="Plus" size={18} className="mr-2" />
