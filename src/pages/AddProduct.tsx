@@ -110,7 +110,7 @@ const AddProduct = () => {
                 <Label htmlFor="name">Название Brainrot *</Label>
                 <Input
                   id="name"
-                  placeholder="Например: iPhone 15 Pro"
+                  placeholder="Например: Los Mobilis lava diaimond 180M/s"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
