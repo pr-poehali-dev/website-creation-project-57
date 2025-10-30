@@ -8,33 +8,29 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    telegram: ''
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
+    if (!formData.telegram.startsWith('@')) {
       toast({
         title: 'Ошибка',
-        description: 'Пароли не совпадают',
+        description: 'Никнейм должен начинаться с @',
         variant: 'destructive'
       });
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (formData.telegram.length < 2) {
       toast({
         title: 'Ошибка',
-        description: 'Пароль должен содержать минимум 6 символов',
+        description: 'Введите корректный никнейм Telegram',
         variant: 'destructive'
       });
       return;
@@ -42,32 +38,31 @@ export default function Register() {
 
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     
-    const existingUser = users.find((u: any) => u.email === formData.email);
+    const existingUser = users.find((u: any) => u.telegram === formData.telegram);
     if (existingUser) {
       toast({
         title: 'Ошибка',
-        description: 'Пользователь с таким email уже существует',
+        description: 'Пользователь с таким никнеймом уже зарегистрирован',
         variant: 'destructive'
       });
       return;
     }
 
     const newUser = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password
+      telegram: formData.telegram
     };
 
     users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
 
     toast({
       title: 'Успешно!',
-      description: 'Регистрация прошла успешно. Теперь вы можете войти.'
+      description: 'Регистрация прошла успешно!'
     });
 
     setTimeout(() => {
-      navigate('/login');
+      navigate('/');
     }, 1500);
   };
 
@@ -102,92 +97,21 @@ export default function Register() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium">
-                  Имя
+                <label htmlFor="telegram" className="text-sm font-medium">
+                  Никнейм Telegram
                 </label>
                 <div className="relative">
-                  <Icon name="User" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Icon name="AtSign" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    id="name"
-                    name="name"
+                    id="telegram"
+                    name="telegram"
                     type="text"
-                    placeholder="Введите ваше имя"
-                    value={formData.name}
+                    placeholder="@username"
+                    value={formData.telegram}
                     onChange={handleChange}
                     className="pl-10"
                     required
                   />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">
-                  Email
-                </label>
-                <div className="relative">
-                  <Icon name="Mail" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="example@mail.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">
-                  Пароль
-                </label>
-                <div className="relative">
-                  <Icon name="Lock" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Минимум 6 символов"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Icon name={showPassword ? "EyeOff" : "Eye"} size={18} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="text-sm font-medium">
-                  Подтвердите пароль
-                </label>
-                <div className="relative">
-                  <Icon name="Lock" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Повторите пароль"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <Icon name={showConfirmPassword ? "EyeOff" : "Eye"} size={18} />
-                  </button>
                 </div>
               </div>
 
@@ -196,12 +120,7 @@ export default function Register() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Уже есть аккаунт? </span>
-              <Link to="/login" className="text-primary font-medium hover:underline">
-                Войти
-              </Link>
-            </div>
+
           </CardContent>
         </Card>
 
