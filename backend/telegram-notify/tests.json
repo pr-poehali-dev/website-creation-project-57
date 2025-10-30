@@ -1,0 +1,21 @@
+{
+  "tests": [
+    {
+      "name": "Test telegram notification",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Test Brainrot",
+        "price": "9999",
+        "category": "electronics",
+        "seller_name": "Test Seller",
+        "telegram_username": "testuser"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
