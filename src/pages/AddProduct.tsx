@@ -15,7 +15,8 @@ const AddProduct = () => {
     name: '',
     price: '',
     category: 'electronics',
-    image: ''
+    image: '',
+    telegram: ''
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -32,7 +33,7 @@ const AddProduct = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.price) {
+    if (!formData.name || !formData.price || !formData.telegram) {
       toast({
         title: 'Ошибка',
         description: 'Заполните все обязательные поля',
@@ -44,7 +45,7 @@ const AddProduct = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841', {
+      const productResponse = await fetch('https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -59,15 +60,29 @@ const AddProduct = () => {
         })
       });
 
-      if (response.ok) {
-        toast({
-          title: 'Успешно!',
-          description: 'Ваш Brainrot добавлен в каталог'
-        });
-        navigate('/');
-      } else {
+      if (!productResponse.ok) {
         throw new Error('Failed to create product');
       }
+
+      await fetch('https://functions.poehali.dev/20a839c6-48ea-47ee-af5a-571acc63b67e', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          price: parseFloat(formData.price),
+          category: formData.category,
+          seller_name: currentUser.name,
+          telegram_username: formData.telegram
+        })
+      });
+
+      toast({
+        title: 'Успешно!',
+        description: 'Ваш Brainrot добавлен в каталог'
+      });
+      navigate('/');
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -161,6 +176,17 @@ const AddProduct = () => {
                 <p className="text-xs text-muted-foreground">
                   Если не указано, будет использовано изображение по умолчанию
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="telegram">Ваш Telegram (без @) *</Label>
+                <Input
+                  id="telegram"
+                  placeholder="username"
+                  value={formData.telegram}
+                  onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                  required
+                />
               </div>
 
               <Button 
