@@ -125,12 +125,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            cur.execute("""
-                UPDATE products
-                SET status = 'deleted'
-                WHERE id = %s AND seller_email = %s
-                RETURNING id
-            """, (product_id, user_email))
+            if user_email == 'admin@mns.shop':
+                cur.execute("""
+                    UPDATE products
+                    SET status = 'deleted'
+                    WHERE id = %s
+                    RETURNING id
+                """, (product_id,))
+            else:
+                cur.execute("""
+                    UPDATE products
+                    SET status = 'deleted'
+                    WHERE id = %s AND seller_email = %s
+                    RETURNING id
+                """, (product_id, user_email))
             
             result = cur.fetchone()
             if not result:
