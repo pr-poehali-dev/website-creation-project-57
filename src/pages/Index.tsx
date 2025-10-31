@@ -30,9 +30,12 @@ const Index = () => {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'F5' && e.code === 'KeyG') {
+      if (e.ctrlKey && e.code === 'KeyG') {
         e.preventDefault();
-        setAdminMode(prev => !prev);
+        setAdminMode(prev => {
+          console.log('Admin mode toggled:', !prev);
+          return !prev;
+        });
       }
     };
     window.addEventListener('keydown', handleKeyPress);
