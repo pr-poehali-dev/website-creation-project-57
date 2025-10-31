@@ -25,7 +25,18 @@ const Index = () => {
   const [category, setCategory] = useState('all');
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userProducts, setUserProducts] = useState<any[]>([]);
+  const [adminMode, setAdminMode] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        setAdminMode(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   useEffect(() => {
     const user = localStorage.getItem('currentUser');
@@ -58,6 +69,26 @@ const Index = () => {
       return;
     }
     window.open(`https://t.me/CeTzyyy?text=Хочу купить: ${product.name} (${product.price} ₽)`, '_blank');
+  };
+
+  const handleDeleteProduct = async (productId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Удалить этот товар из каталога?')) return;
+    
+    try {
+      const response = await fetch(`https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841?id=${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-User-Email': 'admin@mns.shop'
+        }
+      });
+      
+      if (response.ok) {
+        await fetchProducts();
+      }
+    } catch (error) {
+      console.error('Failed to delete product:', error);
+    }
   };
 
   const allProducts = [...products, ...userProducts];
@@ -165,7 +196,15 @@ const Index = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product, index) => (
-              <Card key={product.id} className="group hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 animate-scale-in border-border/50" style={{ animationDelay: `${index * 50}ms` }}>
+              <Card key={product.id} className="group hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 animate-scale-in border-border/50 relative" style={{ animationDelay: `${index * 50}ms` }}>
+                {adminMode && (
+                  <button
+                    onClick={(e) => handleDeleteProduct(product.id, e)}
+                    className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                  >
+                    <Icon name="X" size={16} />
+                  </button>
+                )}
                 <CardContent className="p-6">
                   <div className="mb-4 text-center overflow-hidden rounded-lg">
                     <img 
