@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "name": "Get reviews",
+      "method": "GET",
+      "path": "/?seller_email=test@example.com&action=reviews",
+      "expectedStatus": 200,
+      "expectedBody": [],
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Add review",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "review",
+        "seller_email": "seller@example.com",
+        "reviewer_email": "buyer@example.com",
+        "reviewer_name": "Test User",
+        "rating": 5,
+        "comment": "Great seller!"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

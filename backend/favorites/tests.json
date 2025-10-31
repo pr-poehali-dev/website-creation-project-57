@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "Get favorites",
+      "method": "GET",
+      "path": "/?user_email=test@example.com",
+      "expectedStatus": 200,
+      "expectedBody": [],
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Add to favorites",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_email": "test@example.com",
+        "product_id": 1
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

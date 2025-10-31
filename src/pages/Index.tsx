@@ -18,6 +18,10 @@ const Index = () => {
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [adminMode, setAdminMode] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [sortBy, setSortBy] = useState('newest');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+  const [favorites, setFavorites] = useState<number[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,6 +46,12 @@ const Index = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      fetchFavorites();
+    }
+  }, [currentUser]);
+
   const fetchProducts = async () => {
     try {
       const response = await fetch('https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841');
@@ -54,16 +64,75 @@ const Index = () => {
     }
   };
 
+  const fetchFavorites = async () => {
+    if (!currentUser) return;
+    try {
+      const response = await fetch(`https://functions.poehali.dev/3dd7b6c6-8df1-4991-a4fd-9969397ab8bc?user_email=${currentUser.email}`);
+      if (response.ok) {
+        const data = await response.json();
+        setFavorites(data.map((item: any) => item.id));
+      }
+    } catch (error) {
+      console.error('Failed to fetch favorites:', error);
+    }
+  };
+
+  const toggleFavorite = async (productId: number) => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    const isFavorite = favorites.includes(productId);
+    
+    try {
+      if (isFavorite) {
+        await fetch(`https://functions.poehali.dev/3dd7b6c6-8df1-4991-a4fd-9969397ab8bc?user_email=${currentUser.email}&product_id=${productId}`, {
+          method: 'DELETE'
+        });
+        setFavorites(favorites.filter(id => id !== productId));
+      } else {
+        await fetch('https://functions.poehali.dev/3dd7b6c6-8df1-4991-a4fd-9969397ab8bc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_email: currentUser.email, product_id: productId })
+        });
+        setFavorites([...favorites, productId]);
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     setCurrentUser(null);
   };
 
-  const handlePurchase = (product: any) => {
+  const handlePurchase = async (product: any) => {
     if (!currentUser) {
       navigate('/login');
       return;
     }
+    
+    try {
+      await fetch('https://functions.poehali.dev/0f2c69fc-a273-45c0-bf47-9e7dc37204d6', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'purchase',
+          product_id: product.id,
+          buyer_email: currentUser.email,
+          buyer_name: currentUser.name,
+          seller_email: product.seller_email || 'admin@mns.shop',
+          product_name: product.name,
+          product_price: product.price
+        })
+      });
+    } catch (error) {
+      console.error('Failed to record purchase:', error);
+    }
+    
     window.open(`https://t.me/CeTzyyy?text=Хочу купить: ${product.name} (${product.price} ₽)`, '_blank');
   };
 
@@ -131,11 +200,21 @@ const Index = () => {
 
   const allProducts = [...products, ...userProducts];
 
-  const filteredProducts = allProducts.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = category === 'all' || p.category === category;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredProducts = allProducts
+    .filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = category === 'all' || p.category === category;
+      const matchesPriceMin = !priceMin || p.price >= parseFloat(priceMin);
+      const matchesPriceMax = !priceMax || p.price <= parseFloat(priceMax);
+      return matchesSearch && matchesCategory && matchesPriceMin && matchesPriceMax;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'price-asc') return a.price - b.price;
+      if (sortBy === 'price-desc') return b.price - a.price;
+      if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+      if (sortBy === 'name') return a.name.localeCompare(b.name);
+      return 0;
+    });
 
   return (
     <div className="min-h-screen bg-background">
@@ -151,6 +230,14 @@ const Index = () => {
           <div className="flex items-center gap-2">
             {currentUser ? (
               <>
+                <Button variant="outline" size="icon" className="relative" onClick={() => alert(`У вас ${favorites.length} товаров в избранном`)}>
+                  <Icon name="Heart" size={20} />
+                  {favorites.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                      {favorites.length}
+                    </span>
+                  )}
+                </Button>
                 <Link to="/add-product">
                   <Button variant="outline" className="hidden md:flex">
                     <Icon name="Plus" size={18} className="mr-2" />
@@ -171,9 +258,6 @@ const Index = () => {
                 </Button>
               </Link>
             )}
-            <Button variant="outline" size="icon">
-              <Icon name="ShoppingCart" size={20} />
-            </Button>
           </div>
         </div>
       </header>
@@ -212,45 +296,88 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">Каталог товаров</h2>
           
-          <div className="mb-8 flex flex-col md:flex-row gap-4 items-center">
-            <div className="relative flex-1 max-w-md">
-              <Icon name="Search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Поиск товаров..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
-              />
+          <div className="mb-8 space-y-4">
+            <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div className="relative flex-1 max-w-md">
+                <Icon name="Search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Поиск товаров..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <Tabs value={category} onValueChange={setCategory}>
+                <TabsList className="bg-card">
+                  <TabsTrigger value="all">Всё</TabsTrigger>
+                  <TabsTrigger value="electronics">Brainrot</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
             
-            <Tabs value={category} onValueChange={setCategory}>
-              <TabsList className="bg-card">
-                <TabsTrigger value="all">Всё</TabsTrigger>
-                <TabsTrigger value="electronics">Brainrot</TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="Цена от"
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(e.target.value)}
+                  className="w-32"
+                />
+                <Input
+                  type="number"
+                  placeholder="Цена до"
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(e.target.value)}
+                  className="w-32"
+                />
+              </div>
+              
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-2 border rounded-md bg-background"
+              >
+                <option value="newest">Сначала новые</option>
+                <option value="price-asc">Дешевле</option>
+                <option value="price-desc">Дороже</option>
+                <option value="rating">По рейтингу</option>
+                <option value="name">По названию</option>
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product, index) => (
               <Card key={product.id} className="group hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 animate-scale-in border-border/50 relative" style={{ animationDelay: `${index * 50}ms` }}>
-                {adminMode && (
-                  <div className="absolute top-2 right-2 z-10 flex gap-2">
+                <div className="absolute top-2 right-2 z-10 flex gap-2">
+                  {!adminMode && (
                     <button
-                      onClick={(e) => handleEditProduct(product, e)}
-                      className="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                      onClick={() => toggleFavorite(product.id)}
+                      className="w-8 h-8 rounded-full bg-white/90 hover:bg-white text-red-500 flex items-center justify-center shadow-lg transition-all hover:scale-110"
                     >
-                      <Icon name="Pencil" size={16} />
+                      <Icon name="Heart" size={16} className={favorites.includes(product.id) ? 'fill-red-500' : ''} />
                     </button>
-                    <button
-                      onClick={(e) => handleDeleteProduct(product.id, e)}
-                      className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                    >
-                      <Icon name="X" size={16} />
-                    </button>
-                  </div>
-                )}
+                  )}
+                  {adminMode && (
+                    <>
+                      <button
+                        onClick={(e) => handleEditProduct(product, e)}
+                        className="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                      >
+                        <Icon name="Pencil" size={16} />
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteProduct(product.id, e)}
+                        className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                      >
+                        <Icon name="X" size={16} />
+                      </button>
+                    </>
+                  )}
+                </div>
                 <CardContent className="p-6">
                   <div className="mb-4 text-center overflow-hidden rounded-lg">
                     <img 
