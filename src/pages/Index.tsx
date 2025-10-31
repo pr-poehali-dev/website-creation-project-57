@@ -77,21 +77,32 @@ const Index = () => {
 
   const handleDeleteProduct = async (productId: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Deleting product ID:', productId);
     if (!confirm('Удалить этот товар из каталога?')) return;
     
     try {
-      const response = await fetch(`https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841?id=${productId}`, {
+      const url = `https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841?id=${productId}`;
+      console.log('DELETE request to:', url);
+      
+      const response = await fetch(url, {
         method: 'DELETE',
         headers: {
           'X-User-Email': 'admin@mns.shop'
         }
       });
       
+      const data = await response.json();
+      console.log('Delete response:', response.status, data);
+      
       if (response.ok) {
+        console.log('Product deleted, refreshing list...');
         await fetchProducts();
+      } else {
+        alert('Ошибка: ' + (data.error || 'Не удалось удалить товар'));
       }
     } catch (error) {
       console.error('Failed to delete product:', error);
+      alert('Ошибка при удалении товара');
     }
   };
 
