@@ -6,7 +6,7 @@ from decimal import Decimal
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: API для управления товарами пользователей (создание, получение, удаление)
+    Business: API для управления товарами пользователей (создание, получение, обновление, удаление)
     Args: event - dict с httpMethod, body, queryStringParameters
           context - объект с request_id, function_name
     Returns: HTTP response dict
@@ -18,7 +18,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type, X-User-Email',
                 'Access-Control-Max-Age': '86400'
             },
@@ -107,6 +107,64 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'statusCode': 201,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({'id': product_id, 'message': 'Product created successfully'}),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'PUT':
+            body_data = json.loads(event.get('body', '{}'))
+            product_id = body_data.get('id')
+            user_email = event.get('headers', {}).get('X-User-Email')
+            
+            if not product_id:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Missing product ID'}),
+                    'isBase64Encoded': False
+                }
+            
+            name = body_data.get('name', '').strip()
+            price = body_data.get('price')
+            category = body_data.get('category', '').strip()
+            image = body_data.get('image', '').strip()
+            
+            if user_email == 'admin@mns.shop':
+                cur.execute("""
+                    UPDATE products
+                    SET name = %s, price = %s, category = %s, image = %s
+                    WHERE id = %s
+                    RETURNING id
+                """, (name, price, category, image, product_id))
+            else:
+                cur.execute("""
+                    UPDATE products
+                    SET name = %s, price = %s, category = %s, image = %s
+                    WHERE id = %s AND seller_email = %s
+                    RETURNING id
+                """, (name, price, category, image, product_id, user_email))
+            
+            result = cur.fetchone()
+            if not result:
+                conn.commit()
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Product not found or you are not the seller'}),
+                    'isBase64Encoded': False
+                }
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'message': 'Product updated successfully'}),
                 'isBase64Encoded': False
             }
         

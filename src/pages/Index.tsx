@@ -17,6 +17,7 @@ const Index = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [adminMode, setAdminMode] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -94,6 +95,37 @@ const Index = () => {
     } catch (error) {
       console.error('Failed to delete product:', error);
       alert('Ошибка при удалении товара');
+    }
+  };
+
+  const handleEditProduct = (product: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingProduct(product);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingProduct) return;
+    
+    try {
+      const response = await fetch('https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Email': 'admin@mns.shop'
+        },
+        body: JSON.stringify(editingProduct)
+      });
+      
+      if (response.ok) {
+        await fetchProducts();
+        setEditingProduct(null);
+      } else {
+        const data = await response.json();
+        alert('Ошибка: ' + (data.error || 'Не удалось обновить товар'));
+      }
+    } catch (error) {
+      console.error('Failed to update product:', error);
+      alert('Ошибка при обновлении товара');
     }
   };
 
@@ -204,12 +236,20 @@ const Index = () => {
             {filteredProducts.map((product, index) => (
               <Card key={product.id} className="group hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 animate-scale-in border-border/50 relative" style={{ animationDelay: `${index * 50}ms` }}>
                 {adminMode && (
-                  <button
-                    onClick={(e) => handleDeleteProduct(product.id, e)}
-                    className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                  >
-                    <Icon name="X" size={16} />
-                  </button>
+                  <div className="absolute top-2 right-2 z-10 flex gap-2">
+                    <button
+                      onClick={(e) => handleEditProduct(product, e)}
+                      className="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                    >
+                      <Icon name="Pencil" size={16} />
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteProduct(product.id, e)}
+                      className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                    >
+                      <Icon name="X" size={16} />
+                    </button>
+                  </div>
                 )}
                 <CardContent className="p-6">
                   <div className="mb-4 text-center overflow-hidden rounded-lg">
@@ -284,6 +324,51 @@ const Index = () => {
           <p>© 2025 MNS.shop. Все права защищены</p>
         </div>
       </footer>
+
+      {editingProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setEditingProduct(null)}>
+          <Card className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <CardHeader>
+              <CardTitle>Редактировать товар</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Название</Label>
+                <Input 
+                  value={editingProduct.name}
+                  onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label>Цена (₽)</Label>
+                <Input 
+                  type="number"
+                  value={editingProduct.price}
+                  onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value)})}
+                />
+              </div>
+              <div>
+                <Label>Категория</Label>
+                <Input 
+                  value={editingProduct.category}
+                  onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label>Ссылка на изображение</Label>
+                <Input 
+                  value={editingProduct.image}
+                  onChange={(e) => setEditingProduct({...editingProduct, image: e.target.value})}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleSaveEdit} className="flex-1">Сохранить</Button>
+                <Button onClick={() => setEditingProduct(null)} variant="outline" className="flex-1">Отмена</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
