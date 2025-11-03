@@ -26,18 +26,23 @@ const SellerProfile = () => {
 
   const fetchSellerData = async () => {
     try {
-      const usersResp = await fetch('https://functions.poehali.dev/f6c7a77e-0f88-40e8-923b-4bb5c0a91bcc');
-      if (usersResp.ok) {
-        const users = await usersResp.json();
-        const foundSeller = users.find((u: any) => u.email === email);
-        setSeller(foundSeller);
-      }
-
       const productsResp = await fetch('https://functions.poehali.dev/84a3f103-fdda-416a-abf4-551410b16841');
       if (productsResp.ok) {
         const allProducts = await productsResp.json();
         const sellerProducts = allProducts.filter((p: any) => p.seller_email === email);
         setProducts(sellerProducts);
+        
+        if (sellerProducts.length > 0) {
+          setSeller({
+            email: email,
+            name: sellerProducts[0].seller_name || email?.split('@')[0] || 'Продавец'
+          });
+        } else {
+          setSeller({
+            email: email,
+            name: email?.split('@')[0] || 'Продавец'
+          });
+        }
       }
 
       const reviewsResp = await fetch(`https://functions.poehali.dev/0f2c69fc-a273-45c0-bf47-9e7dc37204d6?action=get_reviews&seller_email=${email}`);
