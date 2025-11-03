@@ -52,9 +52,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            if action == 'reviews':
+            if action == 'get_reviews':
                 cur.execute("""
-                    SELECT reviewer_name, rating, comment, created_at
+                    SELECT id, reviewer_name, rating, comment, created_at
                     FROM seller_reviews
                     WHERE seller_email = %s
                     ORDER BY created_at DESC
@@ -64,10 +64,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 reviews = []
                 for row in rows:
                     reviews.append({
-                        'reviewer_name': row[0],
-                        'rating': row[1],
-                        'comment': row[2],
-                        'created_at': row[3].isoformat() if row[3] else None
+                        'id': row[0],
+                        'reviewer_name': row[1],
+                        'rating': row[2],
+                        'comment': row[3],
+                        'created_at': row[4].isoformat() if row[4] else None
                     })
                 
                 cur.close()
@@ -80,9 +81,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            elif action == 'sales':
+            elif action == 'get_purchases':
                 cur.execute("""
-                    SELECT product_name, product_price, buyer_name, created_at
+                    SELECT id, product_name, product_price, buyer_name, created_at
                     FROM purchase_history
                     WHERE seller_email = %s
                     ORDER BY created_at DESC
@@ -93,10 +94,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 sales = []
                 for row in rows:
                     sales.append({
-                        'product_name': row[0],
-                        'product_price': float(row[1]),
-                        'buyer_name': row[2] if row[2] else 'Анонимный',
-                        'created_at': row[3].isoformat() if row[3] else None
+                        'id': row[0],
+                        'product_name': row[1],
+                        'product_price': float(row[2]),
+                        'buyer_name': row[3] if row[3] else 'Анонимный',
+                        'created_at': row[4].isoformat() if row[4] else None
                     })
                 
                 cur.close()
@@ -113,7 +115,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_data = json.loads(event.get('body', '{}'))
             action = body_data.get('action', 'review')
             
-            if action == 'review':
+            if action == 'add_review':
                 seller_email = body_data.get('seller_email', '').strip()
                 reviewer_email = body_data.get('reviewer_email', '').strip()
                 reviewer_name = body_data.get('reviewer_name', '').strip()

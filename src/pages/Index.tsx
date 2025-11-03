@@ -11,7 +11,7 @@ const products: any[] = [];
 
 const reviews = [];
 
-const Index = () => {
+const Index = ({ theme, toggleTheme }: { theme: 'light' | 'dark', toggleTheme: () => void }) => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -228,6 +228,9 @@ const Index = () => {
             <a href="#reviews" className="text-foreground/80 hover:text-foreground transition-colors">Отзывы</a>
           </nav>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+              <Icon name={theme === 'light' ? 'Moon' : 'Sun'} size={20} />
+            </Button>
             {currentUser ? (
               <>
                 <Button variant="outline" size="icon" className="relative" onClick={() => alert(`У вас ${favorites.length} товаров в избранном`)}>
@@ -402,6 +405,15 @@ const Index = () => {
                   <p className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                     {product.price.toLocaleString()} ₽
                   </p>
+                  {product.seller_email && (
+                    <button
+                      onClick={() => navigate(`/seller/${product.seller_email}`)}
+                      className="text-sm text-primary hover:underline mt-2 flex items-center gap-1"
+                    >
+                      <Icon name="User" size={14} />
+                      Профиль продавца
+                    </button>
+                  )}
                 </CardContent>
                 <CardFooter className="p-6 pt-0">
                   <Button 

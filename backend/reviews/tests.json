@@ -3,7 +3,7 @@
     {
       "name": "Get reviews",
       "method": "GET",
-      "path": "/?seller_email=test@example.com&action=reviews",
+      "path": "/?seller_email=test@example.com&action=get_reviews",
       "expectedStatus": 200,
       "expectedBody": [],
       "bodyMatcher": "partial"
@@ -13,7 +13,7 @@
       "method": "POST",
       "path": "/",
       "body": {
-        "action": "review",
+        "action": "add_review",
         "seller_email": "seller@example.com",
         "reviewer_email": "buyer@example.com",
         "reviewer_name": "Test User",
