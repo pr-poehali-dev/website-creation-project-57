@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -7,18 +7,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Register() {
-  const [formData, setFormData] = useState({
-    telegram: ''
-  });
-
-
+  const [step, setStep] = useState<'telegram' | 'code'>('telegram');
+  const [telegram, setTelegram] = useState('');
+  const [code, setCode] = useState('');
+  const [telegramLink, setTelegramLink] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [expiresIn, setExpiresIn] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft]);
 
-    if (!formData.telegram.startsWith('@')) {
+  const handleSendCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!telegram.startsWith('@')) {
       toast({
         title: 'Ошибка',
         description: 'Никнейм должен начинаться с @',
@@ -27,7 +36,7 @@ export default function Register() {
       return;
     }
 
-    if (formData.telegram.length < 2) {
+    if (telegram.length < 2) {
       toast({
         title: 'Ошибка',
         description: 'Введите корректный никнейм Telegram',
@@ -36,41 +45,113 @@ export default function Register() {
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    const existingUser = users.find((u: any) => u.telegram === formData.telegram);
-    if (existingUser) {
+    setLoading(true);
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/d5eb8d95-2086-4a78-834c-da09e5dede80', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send_code',
+          telegram_username: telegram
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setTelegramLink(data.telegram_link);
+        setExpiresIn(data.expires_in || 300);
+        setTimeLeft(data.expires_in || 300);
+        toast({
+          title: 'Код отправлен!',
+          description: data.message
+        });
+        setStep('code');
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: data.error || 'Не удалось отправить код',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
       toast({
         title: 'Ошибка',
-        description: 'Пользователь с таким никнеймом уже зарегистрирован',
+        description: 'Проблема с подключением',
         variant: 'destructive'
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    const newUser = {
-      telegram: formData.telegram
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-
-    toast({
-      title: 'Успешно!',
-      description: 'Регистрация прошла успешно!'
-    });
-
-    setTimeout(() => {
-      navigate('/');
-    }, 1500);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/d5eb8d95-2086-4a78-834c-da09e5dede80', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'verify_code',
+          telegram_username: telegram,
+          code: code
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.verified) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        
+        const existingUser = users.find((u: any) => u.telegram === telegram);
+        if (existingUser) {
+          toast({
+            title: 'Ошибка',
+            description: 'Пользователь с таким никнеймом уже зарегистрирован',
+            variant: 'destructive'
+          });
+          setLoading(false);
+          return;
+        }
+
+        const newUser = { telegram };
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+        toast({
+          title: 'Успешно!',
+          description: 'Регистрация прошла успешно!'
+        });
+
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: data.error || 'Неверный код',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Проблема с подключением',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -91,36 +172,114 @@ export default function Register() {
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Регистрация</CardTitle>
             <CardDescription className="text-center">
-              Создайте аккаунт для покупок
+              {step === 'telegram' ? 'Введите ваш Telegram' : 'Введите код из Telegram'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="telegram" className="text-sm font-medium">
-                  Никнейм Telegram
-                </label>
-                <div className="relative">
-                  <Icon name="AtSign" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="telegram"
-                    name="telegram"
-                    type="text"
-                    placeholder="@username"
-                    value={formData.telegram}
-                    onChange={handleChange}
-                    className="pl-10"
-                    required
-                  />
+            {step === 'telegram' ? (
+              <form onSubmit={handleSendCode} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="telegram" className="text-sm font-medium">
+                    Никнейм Telegram
+                  </label>
+                  <div className="relative">
+                    <Icon name="AtSign" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="telegram"
+                      name="telegram"
+                      type="text"
+                      placeholder="@username"
+                      value={telegram}
+                      onChange={(e) => setTelegram(e.target.value)}
+                      className="pl-10"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
                 </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+                  disabled={loading}
+                >
+                  {loading ? 'Отправка...' : 'Получить код'}
+                </Button>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm space-y-2">
+                  <p>Код отправлен на ваш Telegram</p>
+                  {timeLeft > 0 ? (
+                    <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                      <Icon name="Clock" size={14} />
+                      <span className="font-mono font-bold">{formatTime(timeLeft)}</span>
+                    </div>
+                  ) : (
+                    <p className="text-red-600 dark:text-red-400 font-medium">Код истек</p>
+                  )}
+                  <a 
+                    href={telegramLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline flex items-center gap-1"
+                  >
+                    <Icon name="ExternalLink" size={14} />
+                    Открыть Telegram
+                  </a>
+                </div>
+
+                <form onSubmit={handleVerifyCode} className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="code" className="text-sm font-medium">
+                      Код подтверждения
+                    </label>
+                    <div className="relative">
+                      <Icon name="Key" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="code"
+                        name="code"
+                        type="text"
+                        placeholder="123456"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        className="pl-10"
+                        maxLength={6}
+                        required
+                        disabled={loading || timeLeft === 0}
+                      />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+                    disabled={loading || timeLeft === 0}
+                  >
+                    {loading ? 'Проверка...' : 'Зарегистрироваться'}
+                  </Button>
+
+                  <Button 
+                    type="button"
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => {
+                      setStep('telegram');
+                      setTimeLeft(0);
+                    }}
+                  >
+                    Изменить Telegram
+                  </Button>
+                </form>
               </div>
+            )}
 
-              <Button type="submit" className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
-                Зарегистрироваться
-              </Button>
-            </form>
-
-
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">Уже есть аккаунт? </span>
+              <Link to="/login" className="text-primary font-medium hover:underline">
+                Войти
+              </Link>
+            </div>
           </CardContent>
         </Card>
 

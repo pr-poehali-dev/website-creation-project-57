@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,8 +12,17 @@ export default function Login() {
   const [code, setCode] = useState('');
   const [telegramLink, setTelegramLink] = useState('');
   const [loading, setLoading] = useState(false);
+  const [expiresIn, setExpiresIn] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft]);
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +52,8 @@ export default function Login() {
 
       if (response.ok && data.success) {
         setTelegramLink(data.telegram_link);
+        setExpiresIn(data.expires_in || 300);
+        setTimeLeft(data.expires_in || 300);
         toast({
           title: 'Код отправлен!',
           description: data.message
@@ -175,8 +186,16 @@ export default function Login() {
               </form>
             ) : (
               <div className="space-y-4">
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm">
-                  <p className="mb-2">Код отправлен на ваш Telegram</p>
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm space-y-2">
+                  <p>Код отправлен на ваш Telegram</p>
+                  {timeLeft > 0 ? (
+                    <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                      <Icon name="Clock" size={14} />
+                      <span className="font-mono font-bold">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
+                    </div>
+                  ) : (
+                    <p className="text-red-600 dark:text-red-400 font-medium">Код истек</p>
+                  )}
                   <a 
                     href={telegramLink} 
                     target="_blank" 
@@ -205,7 +224,7 @@ export default function Login() {
                         className="pl-10"
                         maxLength={6}
                         required
-                        disabled={loading}
+                        disabled={loading || timeLeft === 0}
                       />
                     </div>
                   </div>
@@ -213,7 +232,7 @@ export default function Login() {
                   <Button 
                     type="submit" 
                     className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
-                    disabled={loading}
+                    disabled={loading || timeLeft === 0}
                   >
                     {loading ? 'Проверка...' : 'Войти'}
                   </Button>
@@ -222,7 +241,10 @@ export default function Login() {
                     type="button"
                     variant="ghost"
                     className="w-full"
-                    onClick={() => setStep('telegram')}
+                    onClick={() => {
+                      setStep('telegram');
+                      setTimeLeft(0);
+                    }}
                   >
                     Изменить Telegram
                   </Button>
