@@ -414,6 +414,14 @@ const Index = ({ theme, toggleTheme }: { theme: 'light' | 'dark', toggleTheme: (
                       Профиль продавца
                     </button>
                   )}
+                  {adminMode && (
+                    <div className="mt-3 p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded text-xs space-y-1">
+                      <div><strong>Email:</strong> {product.seller_email || 'N/A'}</div>
+                      <div><strong>Telegram:</strong> {product.seller_telegram || 'N/A'}</div>
+                      <div><strong>Имя:</strong> {product.seller_name || 'N/A'}</div>
+                      <div><strong>ID:</strong> {product.id}</div>
+                    </div>
+                  )}
                 </CardContent>
                 <CardFooter className="p-6 pt-0">
                   <Button 
