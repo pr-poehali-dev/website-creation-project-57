@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import Icon from '@/components/ui/icon';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Header } from '@/components/Header';
+import { HeroSection } from '@/components/HeroSection';
+import { SearchAndFilters } from '@/components/SearchAndFilters';
+import { ProductCard } from '@/components/ProductCard';
+import { EditProductModal } from '@/components/EditProductModal';
+import { ReviewsSection } from '@/components/ReviewsSection';
+import { Footer } from '@/components/Footer';
 
 const products: any[] = [];
-
-const reviews = [];
 
 const Index = ({ theme, toggleTheme }: { theme: 'light' | 'dark', toggleTheme: () => void }) => {
   const [search, setSearch] = useState('');
@@ -218,220 +217,46 @@ const Index = ({ theme, toggleTheme }: { theme: 'light' | 'dark', toggleTheme: (
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            MNS.shop
-          </h1>
-          <nav className="hidden md:flex gap-8">
-            <a href="#catalog" className="text-foreground/80 hover:text-foreground transition-colors">Каталог</a>
-            <a href="#reviews" className="text-foreground/80 hover:text-foreground transition-colors">Отзывы</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              <Icon name={theme === 'light' ? 'Moon' : 'Sun'} size={20} />
-            </Button>
-            {currentUser ? (
-              <>
-                <Button variant="outline" size="icon" className="relative" onClick={() => alert(`У вас ${favorites.length} товаров в избранном`)}>
-                  <Icon name="Heart" size={20} />
-                  {favorites.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                      {favorites.length}
-                    </span>
-                  )}
-                </Button>
-                <Link to="/add-product">
-                  <Button variant="outline" className="hidden md:flex">
-                    <Icon name="Plus" size={18} className="mr-2" />
-                    Добавить товар
-                  </Button>
-                </Link>
-                <Link to="/profile">
-                  <Button variant="outline" size="icon">
-                    <Icon name="User" size={20} />
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <Link to="/login">
-                <Button variant="outline">
-                  <Icon name="User" size={18} className="mr-2" />
-                  Вход
-                </Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header 
+        theme={theme}
+        toggleTheme={toggleTheme}
+        currentUser={currentUser}
+        favoritesCount={favorites.length}
+        onLogout={handleLogout}
+      />
 
-      <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/20" />
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl mx-auto text-center animate-fade-in">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Быстро, надёжно, без обмана
-              </span>
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              У нас все честно и надежно!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/rules">
-                <Button size="lg" className="animate-shimmer text-white relative overflow-hidden group">
-                  <span className="relative z-10">Правила</span>
-                  <span className="absolute inset-0 bg-green-400 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></span>
-                </Button>
-              </Link>
-              <a href="#catalog">
-                <Button size="lg" className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
-                  Смотреть товары
-                  <Icon name="ArrowRight" size={20} className="ml-2" />
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       <section id="catalog" className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">Каталог товаров</h2>
           
-          <div className="mb-8 space-y-4">
-            <div className="flex flex-col md:flex-row gap-4 items-center">
-              <div className="relative flex-1 max-w-md">
-                <Icon name="Search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Поиск товаров..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
-              <Tabs value={category} onValueChange={setCategory}>
-                <TabsList className="bg-card">
-                  <TabsTrigger value="all">Всё</TabsTrigger>
-                  <TabsTrigger value="electronics">Brainrot</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  placeholder="Цена от"
-                  value={priceMin}
-                  onChange={(e) => setPriceMin(e.target.value)}
-                  className="w-32"
-                />
-                <Input
-                  type="number"
-                  placeholder="Цена до"
-                  value={priceMax}
-                  onChange={(e) => setPriceMax(e.target.value)}
-                  className="w-32"
-                />
-              </div>
-              
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border rounded-md bg-background"
-              >
-                <option value="newest">Сначала новые</option>
-                <option value="price-asc">Дешевле</option>
-                <option value="price-desc">Дороже</option>
-                <option value="rating">По рейтингу</option>
-                <option value="name">По названию</option>
-              </select>
-            </div>
-          </div>
+          <SearchAndFilters
+            search={search}
+            setSearch={setSearch}
+            category={category}
+            setCategory={setCategory}
+            priceMin={priceMin}
+            setPriceMin={setPriceMin}
+            priceMax={priceMax}
+            setPriceMax={setPriceMax}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product, index) => (
-              <Card key={product.id} className="group hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 animate-scale-in border-border/50 relative" style={{ animationDelay: `${index * 50}ms` }}>
-                <div className="absolute top-2 right-2 z-10 flex gap-2">
-                  {!adminMode && (
-                    <button
-                      onClick={() => toggleFavorite(product.id)}
-                      className="w-8 h-8 rounded-full bg-white/90 hover:bg-white text-red-500 flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                    >
-                      <Icon name="Heart" size={16} className={favorites.includes(product.id) ? 'fill-red-500' : ''} />
-                    </button>
-                  )}
-                  {adminMode && (
-                    <>
-                      <button
-                        onClick={(e) => handleEditProduct(product, e)}
-                        className="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                      >
-                        <Icon name="Pencil" size={16} />
-                      </button>
-                      <button
-                        onClick={(e) => handleDeleteProduct(product.id, e)}
-                        className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                      >
-                        <Icon name="X" size={16} />
-                      </button>
-                    </>
-                  )}
-                </div>
-                <CardContent className="p-6">
-                  <div className="mb-4 text-center overflow-hidden rounded-lg">
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-lg">{product.name}</h3>
-                    <div className="flex items-center gap-1 text-sm">
-                      <Icon name="Star" size={14} className="fill-accent text-accent" />
-                      <span>{product.rating}</span>
-                    </div>
-                  </div>
-                  <Badge variant="secondary" className="mb-3">
-                    {product.category === 'electronics' && 'Brainrot'}
-                    {product.category === 'clothing' && 'Одежда'}
-                    {product.category === 'shoes' && 'Обувь'}
-                    {product.category === 'accessories' && 'Аксессуары'}
-                  </Badge>
-                  <p className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    {product.price.toLocaleString()} ₽
-                  </p>
-                  {product.seller_email && (
-                    <button
-                      onClick={() => navigate(`/seller/${product.seller_email}`)}
-                      className="text-sm text-primary hover:underline mt-2 flex items-center gap-1"
-                    >
-                      <Icon name="User" size={14} />
-                      Профиль продавца
-                    </button>
-                  )}
-                  {adminMode && (
-                    <div className="mt-3 p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded text-xs space-y-1">
-                      <div><strong>Email:</strong> {product.seller_email || 'N/A'}</div>
-                      <div><strong>Telegram:</strong> {product.seller_telegram || 'N/A'}</div>
-                      <div><strong>Имя:</strong> {product.seller_name || 'N/A'}</div>
-                      <div><strong>ID:</strong> {product.id}</div>
-                    </div>
-                  )}
-                </CardContent>
-                <CardFooter className="p-6 pt-0">
-                  <Button 
-                    className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-                    onClick={() => handlePurchase(product)}
-                  >
-                    Перейти к покупке
-                  </Button>
-                </CardFooter>
-              </Card>
+              <ProductCard
+                key={product.id}
+                product={product}
+                index={index}
+                adminMode={adminMode}
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+                onEdit={handleEditProduct}
+                onDelete={handleDeleteProduct}
+                onPurchase={handlePurchase}
+              />
             ))}
           </div>
 
@@ -443,79 +268,15 @@ const Index = ({ theme, toggleTheme }: { theme: 'light' | 'dark', toggleTheme: (
         </div>
       </section>
 
-      <section id="reviews" className="py-16 bg-card/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Отзывы клиентов</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {reviews.map((review, index) => (
-              <Card key={review.id} className="animate-fade-in border-border/50" style={{ animationDelay: `${index * 100}ms` }}>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Icon key={i} name="Star" size={16} className="fill-accent text-accent" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">{review.text}</p>
-                  <p className="font-semibold">{review.name}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ReviewsSection />
 
+      <Footer />
 
-
-      <footer className="border-t border-border py-8 mt-16">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>© 2025 MNS.shop. Все права защищены</p>
-        </div>
-      </footer>
-
-      {editingProduct && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setEditingProduct(null)}>
-          <Card className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <CardHeader>
-              <CardTitle>Редактировать товар</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Название</Label>
-                <Input 
-                  value={editingProduct.name}
-                  onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label>Цена (₽)</Label>
-                <Input 
-                  type="number"
-                  value={editingProduct.price}
-                  onChange={(e) => setEditingProduct({...editingProduct, price: parseFloat(e.target.value)})}
-                />
-              </div>
-              <div>
-                <Label>Категория</Label>
-                <Input 
-                  value={editingProduct.category}
-                  onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label>Ссылка на изображение</Label>
-                <Input 
-                  value={editingProduct.image}
-                  onChange={(e) => setEditingProduct({...editingProduct, image: e.target.value})}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleSaveEdit} className="flex-1">Сохранить</Button>
-                <Button onClick={() => setEditingProduct(null)} variant="outline" className="flex-1">Отмена</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <EditProductModal
+        editingProduct={editingProduct}
+        setEditingProduct={setEditingProduct}
+        onSave={handleSaveEdit}
+      />
     </div>
   );
 };
