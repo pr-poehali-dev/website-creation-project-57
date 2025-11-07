@@ -27,15 +27,17 @@ const Index = ({ theme, toggleTheme }: { theme: 'light' | 'dark', toggleTheme: (
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.code === 'KeyG') {
         e.preventDefault();
-        setAdminMode(prev => {
-          console.log('Admin mode toggled:', !prev);
-          return !prev;
-        });
+        const newAdminMode = !adminMode;
+        setAdminMode(newAdminMode);
+        localStorage.setItem('adminMode', newAdminMode.toString());
+        if (newAdminMode) {
+          navigate('/admin');
+        }
       }
     };
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [adminMode, navigate]);
 
   useEffect(() => {
     const user = localStorage.getItem('currentUser');

@@ -100,7 +100,7 @@ export const ProductCard = ({
       <CardFooter className="p-6 pt-0">
         <Button 
           className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-          onClick={() => onPurchase(product)}
+          onClick={() => navigate(`/shop?id=${product.id}`)}
         >
           Перейти к покупке
         </Button>
